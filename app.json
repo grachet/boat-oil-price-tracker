@@ -1,0 +1,12 @@
+{
+  "name": "boat-oil-price-tracker",
+  "displayName": "boat-oil-price-tracker",
+  "expo": {
+    "name": "boat-oil-price-tracker",
+    "slug": "boat-oil-price-tracker",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}

@@ -5,7 +5,7 @@ import Connexion from "./screens/Connexion";
 
 export default function App() {
 
-  const [isAuth, setIsAuth] = useState<Boolean>(false);
+  const [isAuth, setIsAuth] = useState<Boolean>(true);//todo false
   const [isSignUpScreen, setIsSignUpScreen] = useState<Boolean>(false);
 
   if (isAuth) {

@@ -10,26 +10,37 @@ export default function Connexion({ setIsAuth, setIsSignUpScreen }: ConnexionPro
 
     const [pseudo, setPseudo] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [error, setError] = useState<string>("Guest account is pseudo/password");
 
     async function auth() {
 
-        const rep = await fetch("http://www.teleobjet.fr/Ports/user.php?pseudo=" + pseudo + "&password=" + password);
 
-        if (rep.ok) {
-            setIsAuth(true);
-        } else {
+
+
+        try {
+            const rep = await fetch("http://www.teleobjet.fr/Ports/user.php?pseudo=" + pseudo + "&password=" + password);
+            console.log(rep)
+            if (rep.ok) {
+                setIsAuth(true);
+            } else {
+                setError("Wrong identifiers (try pseudo/password)")
+                setPseudo("");
+                setPassword("");
+            }
+        } catch (error) {
             setPseudo("");
             setPassword("");
+            setError(error.message)
         }
 
-        console.log(rep)
+
     }
 
     return (
         <View style={styles.container}>
 
             <Text style={styles.logo}>OilTRACK.</Text>
-            <Text style={styles.hint}>Guest account is pseudo/password</Text>
+            <Text style={styles.hint}>{error}</Text>
 
 
             <View style={styles.inputView} >

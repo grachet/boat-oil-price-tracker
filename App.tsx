@@ -1,19 +1,16 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import Home from "./screens/Home";
+import Connexion from "./screens/Connexion";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-    </View>
-  );
+
+  const [isAuth, setIsAuth] = useState<Boolean>(false);
+
+  if (isAuth) {
+    return <Home />
+  } else {
+    return <Connexion setIsAuth={setIsAuth} />
+  }
+
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

@@ -7,11 +7,21 @@ type ConnexionProps = {
 
 export default function Connexion({ setIsAuth }: ConnexionProps) {
 
-    const [email, setEmail] = useState<string>("");
+    const [pseudo, setPseudo] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
-    function auth() {
-        setIsAuth(!!(email + password));
+    async function auth() {
+
+        const rep = await fetch("http://www.teleobjet.fr/Ports/user.php?pseudo=" + pseudo + "&password=" + password);
+
+        if (rep.ok) {
+            setIsAuth(true);
+        } else {
+            setPseudo("");
+            setPassword("");
+        }
+
+        console.log(rep)
     }
 
     return (
@@ -20,41 +30,27 @@ export default function Connexion({ setIsAuth }: ConnexionProps) {
 
             <View style={styles.inputView} >
                 <TextInput
+                    value={pseudo}
                     style={styles.inputText}
-                    placeholder="Email"
+                    placeholder="Pseudo"
                     placeholderTextColor="#003f5c"
-                    onChangeText={text => setEmail(text)} />
+                    onChangeText={text => setPseudo(text)} />
             </View>
 
             <View style={styles.inputView} >
                 <TextInput
+                    value={password}
                     style={styles.inputText}
                     placeholder="Password"
                     placeholderTextColor="#003f5c"
                     onChangeText={text => setPassword(text)} />
             </View>
 
-            {/* <TextInput style={styles.input}
-                autoCapitalize="none"
-                onSubmitEditing={() => this.passwordInput.focus()}
-                autoCorrect={false}
-                keyboardType='email-address'
-                returnKeyType="next"
-                placeholder='Email or Mobile Num'
-                placeholderTextColor='rgba(225,225,225,0.7)' />
-
-            <TextInput style={styles.input}
-                returnKeyType="go"
-                ref={(input) => this.passwordInput = input}
-                placeholder='Password'
-                placeholderTextColor='rgba(225,225,225,0.7)'
-                secureTextEntry /> */}
-
             <TouchableOpacity style={styles.loginBtn} onPress={() => auth()}>
                 <Text style={styles.loginText}>LOGIN</Text>
             </TouchableOpacity>
 
-            <Text style={styles.subText}>Guest account is test/1234</Text>
+            <Text style={styles.subText}>Guest account is pseudo/password</Text>
 
         </View>
     );

@@ -7,7 +7,7 @@ export default function App() {
   const [isAuth, setIsAuth] = useState<Boolean>(false);
 
   if (isAuth) {
-    return <Home />
+    return <Home setIsAuth={setIsAuth} />
   } else {
     return <Connexion setIsAuth={setIsAuth} />
   }

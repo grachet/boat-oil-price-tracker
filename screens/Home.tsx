@@ -1,10 +1,18 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 
-export default function Home() {
+type HomeProps = {
+    setIsAuth: (b: Boolean) => void
+}
+
+export default function Home({ setIsAuth }: HomeProps) {
     return (
         <View style={styles.container}>
-            <Text>Home</Text>
+
+            <TouchableOpacity style={styles.loginBtn} onPress={() => setIsAuth(false)}>
+                <Text style={styles.loginText}>LOGOUT</Text>
+            </TouchableOpacity>
+
         </View>
     );
 }

@@ -54,6 +54,7 @@ export default function Connexion({ setIsAuth, setIsSignUpScreen }: ConnexionPro
 
             <View style={styles.inputView} >
                 <TextInput
+                    secureTextEntry={true}
                     value={password}
                     style={styles.inputText}
                     placeholder="Password"

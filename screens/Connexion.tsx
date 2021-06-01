@@ -3,9 +3,10 @@ import { TextInput, TouchableOpacity, Button, StyleSheet, Text, View } from 'rea
 
 type ConnexionProps = {
     setIsAuth: (b: Boolean) => void
+    setIsSignUpScreen: (b: Boolean) => void
 }
 
-export default function Connexion({ setIsAuth }: ConnexionProps) {
+export default function Connexion({ setIsAuth, setIsSignUpScreen }: ConnexionProps) {
 
     const [pseudo, setPseudo] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -26,7 +27,10 @@ export default function Connexion({ setIsAuth }: ConnexionProps) {
 
     return (
         <View style={styles.container}>
+
             <Text style={styles.logo}>OilTRACK.</Text>
+            <Text style={styles.hint}>Guest account is pseudo/password</Text>
+
 
             <View style={styles.inputView} >
                 <TextInput
@@ -47,10 +51,12 @@ export default function Connexion({ setIsAuth }: ConnexionProps) {
             </View>
 
             <TouchableOpacity style={styles.loginBtn} onPress={() => auth()}>
-                <Text style={styles.loginText}>LOGIN</Text>
+                <Text style={styles.loginText}>SIGN IN</Text>
             </TouchableOpacity>
 
-            <Text style={styles.subText}>Guest account is pseudo/password</Text>
+            <TouchableOpacity style={styles.signInButton} onPress={() => setIsSignUpScreen(true)}>
+                <Text style={styles.noAccount}>Don't have an account? Create</Text>
+            </TouchableOpacity>
 
         </View>
     );
@@ -67,10 +73,15 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 50,
         color: "#fb5b5a",
-        marginBottom: 40
+        marginBottom: 10
     },
-    subText: {
-        color: "#fb5b5a"
+    hint: {
+        color: "#fb5b5a",
+        marginBottom: 30
+    },
+    noAccount: {
+        color: "white",
+        fontSize: 16,
     },
     inputView: {
         width: "80%",
@@ -97,8 +108,16 @@ const styles = StyleSheet.create({
         height: 50,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 40,
+        marginTop: 30,
         marginBottom: 10
     },
+    signInButton: {
+        width: "80%",
+        borderRadius: 25,
+        height: 40,
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 10
+    }
 });
 

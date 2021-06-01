@@ -10,7 +10,7 @@ export default function Home({ setIsAuth }: HomeProps) {
         <View style={styles.container}>
 
             <TouchableOpacity style={styles.loginBtn} onPress={() => setIsAuth(false)}>
-                <Text style={styles.loginText}>LOGOUT</Text>
+                <Text style={styles.loginText}>SIGN OUT</Text>
             </TouchableOpacity>
 
         </View>

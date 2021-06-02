@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, ScrollView, TextInput, Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
+import { FlatList, TextInput, Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 import { matchSorter } from 'match-sorter'
 
 type HomeProps = {
@@ -17,31 +17,33 @@ export default function Home({ setIsAuth }: HomeProps) {
 
 
     const [ports, setPorts] = useState<port[]>([]);
+    const [filteredList, setFilteredList] = useState<port[]>([]);
     const [searchText, setSearchText] = useState<string>("");
 
     useEffect(() => {
         fetch("http://www.teleobjet.fr/Ports/port.php")
             .then(rep => rep.json())
             .then(rep => {
-                setPorts([...rep, ...rep, ...rep, ...rep, ...rep]);
+                setPorts(rep);
+                setFilteredList(rep)
                 console.log(rep);
             })
             .catch(err => console.log(err))
     }, [])
 
     const renderItem = ({ item: { nom, lat, lon } }: { item: port }) => (
-        <View style={styles.item}>
-            <View style={styles.itemLeft}>
-                <Text style={styles.title}>{nom}</Text>
-                <Text style={styles.subTitle}>1.9 km</Text>
+        <TouchableOpacity onPress={() => setIsAuth(false)}>
+            <View style={styles.item}>
+                <View style={styles.itemLeft}>
+                    <Text style={styles.title}>{nom}</Text>
+                    <Text style={styles.subTitle}>1.9 km</Text>
+                </View>
+                <View style={styles.itemRight}>
+                    <Text style={styles.priceText}>3.2 €</Text>
+                </View>
             </View>
-            <View style={styles.itemRight}>
-                <Text style={styles.priceText}>3.2 €</Text>
-            </View>
-        </View>
+        </TouchableOpacity>
     );
-
-    const filteredList = !!searchText ? matchSorter(ports, searchText, { keys: ['nom'] }) : ports;
 
     console.log(filteredList)
 
@@ -51,30 +53,41 @@ export default function Home({ setIsAuth }: HomeProps) {
             <View style={styles.header} >
 
                 <View style={styles.inputView} >
+                    <Image
+                        style={styles.searchIcon}
+                        source={require('../assets/magnifying-glass.png')}
+                    />
                     <TextInput
-                        icon={'../assets/magnifier.png'}
+                        inlineImageLeft="search"
                         value={searchText}
                         style={styles.inputText}
                         placeholder="Search..."
                         placeholderTextColor="#fff"
-                        onChangeText={text => setSearchText(text)} />
+                        onChangeText={text => {
+                            setSearchText(text)
+                            if (!!text) {
+                                setFilteredList(matchSorter(ports, searchText, { keys: ['nom'] }));
+                            } else {
+                                setFilteredList(ports);
+                            }
+                        }} />
                 </View>
 
                 <TouchableOpacity style={styles.menuButton} onPress={() => setIsAuth(false)}>
-                    <Text >SIGN OUT</Text>
+                    <Image
+                        style={styles.menuIcon}
+                        source={require('../assets/menu_white.png')}
+                    />
                 </TouchableOpacity>
 
             </View>
 
-            <ScrollView style={styles.scrollView}>
-                <FlatList
-                    ListHeaderComponent={() => }
-                    data={filteredList}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                />
-            </ScrollView>
-
+            <FlatList
+                style={styles.flatList}
+                data={filteredList}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+            />
         </View>
     );
 }
@@ -86,6 +99,8 @@ const styles = StyleSheet.create({
     },
 
     container: {
+        width: "100%",
+        height: "100%",
         backgroundColor: '#003f5c',
         alignItems: 'center',
         justifyContent: 'center',
@@ -95,22 +110,32 @@ const styles = StyleSheet.create({
         width: "100%",
         backgroundColor: "#fb5b5a",
         flexDirection: "row",
-        paddingHorizontal: 14,
-        paddingVertical: 6,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 2,
         elevation: 2,
-        marginBottom: 12
+        marginBottom: 12,
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+
+    flatList: {
+        paddingHorizontal: 16,
+        width: "100%",
     },
 
     inputView: {
-        width: "70%",
+        maxWidth: 400,
+        flexDirection: "row",
+        flexGrow: 1,
+        marginRight: 16,
         backgroundColor: "#d62a2a",
         borderRadius: 8,
-        height: 36,
-        justifyContent: "center",
+        height: 40,
+        alignItems: "center",
         paddingHorizontal: 10,
     },
 
@@ -119,9 +144,15 @@ const styles = StyleSheet.create({
         color: "white"
     },
 
+    menuIcon: {
+        width: 26,
+        height: 26
+    },
+
     searchIcon: {
-        width: 20,
-        height: 20
+        width: 22,
+        marginRight: 6,
+        height: 22
     },
 
     item: {

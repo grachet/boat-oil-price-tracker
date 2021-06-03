@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, TextInput, Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
-import { matchSorter } from 'match-sorter'
+import { matchSorter } from 'match-sorter';
+import { Button, Menu, Divider, Provider } from 'react-native-paper';
 
 type HomeProps = {
     setIsAuth: (b: Boolean) => void
@@ -20,9 +21,20 @@ type price = {
     idport: string
 };
 
+// fun computeDistanceInKm(port: Port, location: Location) : Double
+//     {
+//         val results = FloatArray(1)
+//         Location.distanceBetween( location.latitude, location.longitude,
+//             port.latitude.toDouble(), port.longitude.toDouble(), results)
+//         return results.first() * 0.001
+//     }
+
 export default function Home({ setIsAuth }: HomeProps) {
 
+    const menuRef = useRef();
 
+    const [openMenu, setOpenMenu] = React.useState(false);
+    const [isKilometers, setIsKilometers] = useState<boolean>(true);
     const [isGazole, setIsGazole] = useState<boolean>(false);
     const [ports, setPorts] = useState<port[]>([]);
     const [filteredList, setFilteredList] = useState<port[]>([]);
@@ -63,7 +75,7 @@ export default function Home({ setIsAuth }: HomeProps) {
             <View style={styles.item}>
                 <View style={styles.itemLeft}>
                     <Text style={styles.title}>{nom}</Text>
-                    <Text style={styles.subTitle}>1.9 km</Text>
+                    <Text style={styles.subTitle}>1.9 {isKilometers ? "Kilometers" : "Miles"}</Text>
                 </View>
                 <View style={styles.itemRight}>
                     <Text style={styles.priceText}>{isGazole ? "GZ" : "SP98"} {prices[id] && prices[id][isGazole ? "gazole" : "sp98"]} €</Text>
@@ -75,47 +87,57 @@ export default function Home({ setIsAuth }: HomeProps) {
     console.log(filteredList, prices)
 
     return (
-        <View style={styles.container}>
-
-            <View style={styles.header} >
-
-                <View style={styles.inputView} >
-                    <Image
-                        style={styles.searchIcon}
-                        source={require('../assets/magnifying-glass.png')}
-                    />
-                    <TextInput
-                        inlineImageLeft="search"
-                        value={searchText}
-                        style={styles.inputText}
-                        placeholder="Search..."
-                        placeholderTextColor="#fff"
-                        onChangeText={text => {
-                            setSearchText(text)
-                            if (!!text) {
-                                setFilteredList(matchSorter(ports, searchText, { keys: ['nom'] }));
-                            } else {
-                                setFilteredList(ports);
-                            }
-                        }} />
+        <Provider>
+            <View style={styles.container}>
+                <View style={styles.header} >
+                    <View style={styles.inputView} >
+                        <Image
+                            style={styles.searchIcon}
+                            source={require('../assets/magnifying-glass.png')}
+                        />
+                        <TextInput
+                            inlineImageLeft="search"
+                            value={searchText}
+                            style={styles.inputText}
+                            placeholder="Search..."
+                            placeholderTextColor="#fff"
+                            onChangeText={text => {
+                                setSearchText(text)
+                                if (!!text) {
+                                    setFilteredList(matchSorter(ports, searchText, { keys: ['nom'] }));
+                                } else {
+                                    setFilteredList(ports);
+                                }
+                            }} />
+                    </View>
+                    <Menu
+                        visible={openMenu}
+                        onDismiss={() => setOpenMenu(false)}
+                        anchor={<TouchableOpacity style={styles.menuButton} onPress={() => setOpenMenu(true)}>
+                            <Image
+                                style={styles.menuIcon}
+                                source={require('../assets/menu_white.png')}
+                            />
+                        </TouchableOpacity>
+                        }>
+                        <Menu.Item onPress={() => setIsAuth(false)} title="Sign out" />
+                        <Divider />
+                        <Menu.Item onPress={() => setIsKilometers(is => !is)} title={isKilometers ? "Kilometers" : "Miles"} />
+                        <Divider />
+                        <Menu.Item onPress={() => setIsGazole(is => !is)} title={isGazole ? "Gazole" : "SP98"} />
+                        {/* <Divider />
+                        <Menu.Item onPress={() => setIsKilometers(is => !is)} title={"10" + (isKilometers ? " Kilometers" : " Miles")} /> */}
+                    </Menu>
                 </View>
-
-                <TouchableOpacity style={styles.menuButton} onPress={() => setIsAuth(false)}>
-                    <Image
-                        style={styles.menuIcon}
-                        source={require('../assets/menu_white.png')}
-                    />
-                </TouchableOpacity>
-
-            </View>
-
-            <FlatList
-                style={styles.flatList}
-                data={filteredList}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-            />
-        </View>
+                <FlatList
+                    extraData={[isKilometers, isGazole, filteredList]}
+                    style={styles.flatList}
+                    data={filteredList}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.id}
+                />
+            </View >
+        </Provider>
     );
 }
 

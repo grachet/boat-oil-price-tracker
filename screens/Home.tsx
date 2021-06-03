@@ -23,6 +23,7 @@ type price = {
 export default function Home({ setIsAuth }: HomeProps) {
 
 
+    const [isGazole, setIsGazole] = useState<boolean>(false);
     const [ports, setPorts] = useState<port[]>([]);
     const [filteredList, setFilteredList] = useState<port[]>([]);
     const [prices, setPrices] = useState<{ [id: string]: price }>({});
@@ -65,8 +66,7 @@ export default function Home({ setIsAuth }: HomeProps) {
                     <Text style={styles.subTitle}>1.9 km</Text>
                 </View>
                 <View style={styles.itemRight}>
-                    <Text style={styles.priceText}>SP98 {prices[id]?.sp98} €</Text>
-                    <Text style={styles.priceText2}>GZ {prices[id]?.gazole} €</Text>
+                    <Text style={styles.priceText}>{isGazole ? "GZ" : "SP98"} {prices[id] && prices[id][isGazole ? "gazole" : "sp98"]} €</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -184,8 +184,7 @@ const styles = StyleSheet.create({
 
     item: {
         backgroundColor: '#002e42',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
+        padding: 12,
         marginVertical: 5,
         borderRadius: 10,
         width: "100%",
@@ -211,22 +210,14 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     itemRight: {
-
     },
     priceText: {
         border: "1px solid white;",
         width: "100%",
         fontSize: 18,
         padding: 2,
-        borderRadius: 5,
-        marginBottom: 5,
-        color: "#fff"
-    },
-    priceText2: {
-        border: "1px solid white;",
-        width: "100%",
-        fontSize: 18,
-        padding: 2,
+        paddingVertical: 2,
+        paddingHorizontal: 4,
         borderRadius: 5,
         color: "#fff"
     },

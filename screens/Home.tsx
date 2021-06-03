@@ -13,11 +13,19 @@ type port = {
     id: string
 };
 
+type price = {
+    jour: string,
+    sp98: string,
+    gazole: string,
+    idport: string
+};
+
 export default function Home({ setIsAuth }: HomeProps) {
 
 
     const [ports, setPorts] = useState<port[]>([]);
     const [filteredList, setFilteredList] = useState<port[]>([]);
+    const [prices, setPrices] = useState<{ [id: string]: price }>({});
     const [searchText, setSearchText] = useState<string>("");
 
     useEffect(() => {
@@ -26,12 +34,30 @@ export default function Home({ setIsAuth }: HomeProps) {
             .then(rep => {
                 setPorts(rep);
                 setFilteredList(rep)
-                console.log(rep);
+            })
+            .catch(err => console.log(err))
+
+        fetch("http://www.teleobjet.fr/Ports/prix.php")
+            .then(rep => rep.json())
+            .then(rep => {
+                setPrices(rep
+                    .sort((a: price, b: price) => {
+                        if (a.jour > b.jour) {
+                            return 1;
+                        }
+                        if (a.jour < b.jour) {
+                            return -1;
+                        }
+                        return 0;
+                    })
+                    .reduce((object: { [id: string]: price }, current: price) => {
+                        return { ...object, [current.idport]: current }
+                    }, {}));
             })
             .catch(err => console.log(err))
     }, [])
 
-    const renderItem = ({ item: { nom, lat, lon } }: { item: port }) => (
+    const renderItem = ({ item: { nom, lat, lon, id } }: { item: port }) => (
         <TouchableOpacity onPress={() => setIsAuth(false)}>
             <View style={styles.item}>
                 <View style={styles.itemLeft}>
@@ -39,13 +65,14 @@ export default function Home({ setIsAuth }: HomeProps) {
                     <Text style={styles.subTitle}>1.9 km</Text>
                 </View>
                 <View style={styles.itemRight}>
-                    <Text style={styles.priceText}>3.2 €</Text>
+                    <Text style={styles.priceText}>SP98 {prices[id]?.sp98} €</Text>
+                    <Text style={styles.priceText2}>GZ {prices[id]?.gazole} €</Text>
                 </View>
             </View>
         </TouchableOpacity>
     );
 
-    console.log(filteredList)
+    console.log(filteredList, prices)
 
     return (
         <View style={styles.container}>
@@ -157,7 +184,8 @@ const styles = StyleSheet.create({
 
     item: {
         backgroundColor: '#002e42',
-        padding: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
         marginVertical: 5,
         borderRadius: 10,
         width: "100%",
@@ -183,13 +211,23 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     itemRight: {
+
     },
     priceText: {
         border: "1px solid white;",
         width: "100%",
-        fontSize: 22,
-        padding: 4,
-        borderRadius: 10,
+        fontSize: 18,
+        padding: 2,
+        borderRadius: 5,
+        marginBottom: 5,
+        color: "#fff"
+    },
+    priceText2: {
+        border: "1px solid white;",
+        width: "100%",
+        fontSize: 18,
+        padding: 2,
+        borderRadius: 5,
         color: "#fff"
     },
     scrollView: {

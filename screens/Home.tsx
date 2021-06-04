@@ -3,7 +3,7 @@ import { FlatList, TextInput, Image, TouchableOpacity, StyleSheet, Text, View } 
 import { matchSorter } from 'match-sorter';
 import { Button, Menu, Divider, Provider } from 'react-native-paper';
 import * as Location from 'expo-location';
-import { getDistanceFromLatLonInKm, round } from "../functions/helperFunctions";
+import { getDistanceFromLatLonInKm, round, kilometersToMiles } from "../functions/helperFunctions";
 
 type HomeProps = {
     setIsAuth: (b: Boolean) => void
@@ -14,7 +14,8 @@ type port = {
     lat: string,
     lon: string,
     id: string,
-    distance?: number,
+    distanceInKilometers?: number,
+    distanceInMiles?: number,
 };
 
 type price = {
@@ -78,12 +79,12 @@ export default function Home({ setIsAuth }: HomeProps) {
             .catch(err => console.log(err))
     }, [])
 
-    const renderItem = ({ item: { nom, id, distance } }: { item: port }) => (
+    const renderItem = ({ item: { nom, id, distanceInKilometers, distanceInMiles } }: { item: port }) => (
         <TouchableOpacity onPress={() => setIsAuth(false)}>
             <View style={styles.item}>
                 <View style={styles.itemLeft}>
                     <Text style={styles.title}>{nom}</Text>
-                    <Text style={styles.subTitle}>{errorLocationMsg}{distance && (distance + (isKilometers ? " Kilometers" : " Miles"))}</Text>
+                    <Text style={styles.subTitle}>{errorLocationMsg || (isKilometers ? distanceInKilometers + " Kilometers" : distanceInMiles + " Miles")}</Text>
                 </View>
                 <View style={styles.itemRight}>
                     <Text style={styles.priceText}>{isGazole ? "GZ" : "SP98"} {prices[id] && prices[id][isGazole ? "gazole" : "sp98"]} €</Text>
@@ -93,15 +94,17 @@ export default function Home({ setIsAuth }: HomeProps) {
     );
 
     const filteredList: port[] = (searchText ? matchSorter(ports, searchText, { keys: ['nom'] }) : ports).map(port => {
+        const distanceInKilometers = round(getDistanceFromLatLonInKm(parseFloat(port.lat), parseFloat(port.lon), location?.coords.latitude || 0, location?.coords.longitude || 0));
         return {
             ...port,
-            distance: round(getDistanceFromLatLonInKm(parseFloat(port.lat), parseFloat(port.lon), location?.coords.latitude || 0, location?.coords.longitude || 0))
+            distanceInKilometers,
+            distanceInMiles: kilometersToMiles(distanceInKilometers)
         };
     }).sort((a: port, b: port) => {
-        if ((a.distance || 0) > (b.distance || 0)) {
+        if ((a.distanceInKilometers || 0) > (b.distanceInKilometers || 0)) {
             return 1;
         }
-        if ((a.distance || 0) < (b.distance || 0)) {
+        if ((a.distanceInKilometers || 0) < (b.distanceInKilometers || 0)) {
             return -1;
         }
         return 0;

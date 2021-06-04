@@ -1,12 +1,20 @@
 {
   "name": "boat-oil-price-tracker",
-  "displayName": "boat-oil-price-tracker",
+  "displayName": "Oil Track",
   "expo": {
-    "name": "boat-oil-price-tracker",
+    "name": "Oil Track",
     "slug": "boat-oil-price-tracker",
+    "icon": "./assets/app_icon.png",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "android": {
+      "package": "com.grachet.oiltrack"
+    }
+  },
+  "android": {
+    "package": "com.grachet.oiltrack",
+    "versionCode": 1
   }
 }

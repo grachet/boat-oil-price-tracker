@@ -27,8 +27,6 @@ type price = {
 
 export default function Home({ setIsAuth }: HomeProps) {
 
-    const menuRef = useRef();
-
     const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined);
     const [errorLocationMsg, setErrorLocationMsg] = useState<string>("Waiting location...");
 

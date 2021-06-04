@@ -167,14 +167,17 @@ const styles = StyleSheet.create({
     },
 
     container: {
-        width: "100%",
-        height: "100%",
+        flex: 1,
+        paddingTop: 62,
         backgroundColor: '#003f5c',
         alignItems: 'center',
         justifyContent: 'center',
     },
 
     header: {
+        position: "absolute",
+        top: 0,
+        left: 0,
         width: "100%",
         backgroundColor: "#fb5b5a",
         flexDirection: "row",
@@ -185,7 +188,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 2,
         elevation: 2,
-        marginBottom: 12,
         alignItems: "center",
         justifyContent: "space-between"
     },

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, TextInput, Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 import { matchSorter } from 'match-sorter';
 import { Button, Menu, Divider, Provider } from 'react-native-paper';
+import * as Location from 'expo-location';
 
 type HomeProps = {
     setIsAuth: (b: Boolean) => void
@@ -11,7 +12,8 @@ type port = {
     nom: string,
     lat: string,
     lon: string,
-    id: string
+    id: string,
+    distance?: string,
 };
 
 type price = {
@@ -21,17 +23,12 @@ type price = {
     idport: string
 };
 
-// fun computeDistanceInKm(port: Port, location: Location) : Double
-//     {
-//         val results = FloatArray(1)
-//         Location.distanceBetween( location.latitude, location.longitude,
-//             port.latitude.toDouble(), port.longitude.toDouble(), results)
-//         return results.first() * 0.001
-//     }
-
 export default function Home({ setIsAuth }: HomeProps) {
 
     const menuRef = useRef();
+
+    const [location, setLocation] = useState<Location.LocationObject | undefined>(undefined);
+    const [errorLocationMsg, setErrorLocationMsg] = useState<string>("Waiting location...");
 
     const [openMenu, setOpenMenu] = React.useState(false);
     const [isKilometers, setIsKilometers] = useState<boolean>(true);
@@ -42,6 +39,20 @@ export default function Home({ setIsAuth }: HomeProps) {
     const [searchText, setSearchText] = useState<string>("");
 
     useEffect(() => {
+
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorLocationMsg('Location fail');
+                return;
+            } else {
+                setErrorLocationMsg('');
+            }
+
+            let locationTemp = await Location.getCurrentPositionAsync({});
+            setLocation(locationTemp);
+        })();
+
         fetch("http://www.teleobjet.fr/Ports/port.php")
             .then(rep => rep.json())
             .then(rep => {
@@ -70,12 +81,12 @@ export default function Home({ setIsAuth }: HomeProps) {
             .catch(err => console.log(err))
     }, [])
 
-    const renderItem = ({ item: { nom, lat, lon, id } }: { item: port }) => (
+    const renderItem = ({ item: { nom, lat, lon, id, distance } }: { item: port }) => (
         <TouchableOpacity onPress={() => setIsAuth(false)}>
             <View style={styles.item}>
                 <View style={styles.itemLeft}>
                     <Text style={styles.title}>{nom}</Text>
-                    <Text style={styles.subTitle}>1.9 {isKilometers ? "Kilometers" : "Miles"}</Text>
+                    <Text style={styles.subTitle}>{errorLocationMsg} {distance && (distance + (isKilometers ? "Kilometers" : "Miles"))}</Text>
                 </View>
                 <View style={styles.itemRight}>
                     <Text style={styles.priceText}>{isGazole ? "GZ" : "SP98"} {prices[id] && prices[id][isGazole ? "gazole" : "sp98"]} €</Text>
@@ -84,7 +95,7 @@ export default function Home({ setIsAuth }: HomeProps) {
         </TouchableOpacity>
     );
 
-    console.log(filteredList, prices)
+    console.log(filteredList, prices, location)
 
     return (
         <Provider>
@@ -130,7 +141,7 @@ export default function Home({ setIsAuth }: HomeProps) {
                     </Menu>
                 </View>
                 <FlatList
-                    extraData={[isKilometers, isGazole, filteredList]}
+                    extraData={[isKilometers, isGazole, filteredList, errorLocationMsg]}
                     style={styles.flatList}
                     data={filteredList}
                     renderItem={renderItem}

@@ -80,21 +80,21 @@ export default function Home({ setIsAuth }: HomeProps) {
     }, [])
 
     const renderItem = ({ item: { nom, id, distanceInKilometers, distanceInMiles } }: { item: port }) => (
-        <TouchableOpacity onPress={() => setIsAuth(false)}>
-            <View style={styles.item}>
-                <View style={styles.itemLeft}>
-                    <Text style={styles.title}>{nom}</Text>
-                    <Text style={styles.subTitle}>{errorLocationMsg || (isKilometers ? distanceInKilometers + " Kilometers" : distanceInMiles + " Miles")}</Text>
-                </View>
-                <View style={styles.itemRight}>
-                    <Text style={styles.priceText}>{isGazole ? "GZ" : "SP98"} {prices[id] && prices[id][isGazole ? "gazole" : "sp98"]} €</Text>
-                </View>
+        // <TouchableOpacity onPress={() => setIsAuth(false)}>
+        <View style={styles.item}>
+            <View style={styles.itemLeft}>
+                <Text style={styles.title}>{nom}</Text>
+                <Text style={styles.subTitle}>{errorLocationMsg || (isKilometers ? distanceInKilometers + " Kilometers" : distanceInMiles + " Miles")}</Text>
             </View>
-        </TouchableOpacity>
+            <View style={styles.itemRight}>
+                <Text style={styles.priceText}>{isGazole ? "GZ" : "SP98"} {prices[id] && prices[id][isGazole ? "gazole" : "sp98"]} €</Text>
+            </View>
+        </View>
+        // </TouchableOpacity>
     );
 
     const filteredList: port[] = (searchText ? matchSorter(ports, searchText, { keys: ['nom'] }) : ports).map(port => {
-        const distanceInKilometers = round(getDistanceFromLatLonInKm(parseFloat(port.lat), parseFloat(port.lon), location?.coords.latitude || 0, location?.coords.longitude || 0));
+        const distanceInKilometers = (port.lat && port.lon && location?.coords.latitude && location?.coords.longitude) ? round(getDistanceFromLatLonInKm(parseFloat(port.lat), parseFloat(port.lon), location?.coords.latitude || 0, location?.coords.longitude || 0)) : 0;
         return {
             ...port,
             distanceInKilometers,
@@ -168,16 +168,13 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        paddingTop: 62,
+        paddingTop: 33,
         backgroundColor: '#003f5c',
         alignItems: 'center',
         justifyContent: 'center',
     },
 
     header: {
-        position: "absolute",
-        top: 0,
-        left: 0,
         width: "100%",
         backgroundColor: "#fb5b5a",
         flexDirection: "row",
@@ -228,7 +225,7 @@ const styles = StyleSheet.create({
     item: {
         backgroundColor: '#002e42',
         padding: 12,
-        marginVertical: 5,
+        marginTop: 10,
         borderRadius: 10,
         width: "100%",
         shadowColor: '#000',
@@ -255,7 +252,9 @@ const styles = StyleSheet.create({
     itemRight: {
     },
     priceText: {
-        border: "1px solid white;",
+        borderStyle: "solid",
+        borderColor: "white",
+        borderWidth: 1,
         width: "100%",
         fontSize: 18,
         padding: 2,
